@@ -5,164 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basic Calculator</title>
     <style>
-        body {
-            background-color: #c7b8ea; /* Light purple background */
-            font-family: Arial, sans-serif;
-        }
-
         .calculator {
-            width: 250px;
+            width: 300px;
             margin: 50px auto;
+            background-color: #ADD8E6;
             padding: 20px;
-            background-color: #f0f0f0;
             border: 1px solid #ccc;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
         #display {
             width: 100%;
             height: 40px;
             font-size: 24px;
+            font-weight: bold;
             text-align: right;
             padding: 10px;
             border: none;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
-        .keys {
+        .numeric-pad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-gap: 10px;
-            margin-top: 20px;
+            padding: 20px;
         }
 
-        .key {
+        button {
+            width: 100%;
             height: 40px;
             font-size: 18px;
+            font-weight: bold;
             border: none;
             border-radius: 10px;
             background-color: #fff;
             cursor: pointer;
         }
 
-        .key:hover {
+        button:hover {
             background-color: #f0f0f0;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .calculator {
-                width: 200px;
-                margin: 50px auto;
-            }
-            .key {
-                height: 30px;
-                font-size: 16px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="calculator">
         <input type="text" id="display" disabled>
-        <div class="keys">
-            <!-- Numeric keys (0-9) -->
-            <button class="key" id="7">7</button>
-            <button class="key" id="8">8</button>
-            <button class="key" id="9">9</button>
-            <button class="key" id="divide">/</button>
-            <button class="key" id="4">4</button>
-            <button class="key" id="5">5</button>
-            <button class="key" id="6">6</button>
-            <button class="key" id="multiply">*</button>
-            <button class="key" id="1">1</button>
-            <button class="key" id="2">2</button>
-            <button class="key" id="3">3</button>
-            <button class="key" id="subtract">-</button>
-            <button class="key" id="0">0</button>
-            <button class="key" id="decimal">.</button>
-            <button class="key" id="equals">=</button>
-            <button class="key" id="add">+</button>
-            <button class="key" id="clear">AC</button>
+        <div class="numeric-pad">
+            <button class="number" value="7">7</button>
+            <button class="number" value="8">8</button>
+            <button class="number" value="9">9</button>
+            <button class="operation" value="+">+</button>
+            <button class="number" value="4">4</button>
+            <button class="number" value="5">5</button>
+            <button class="number" value="6">6</button>
+            <button class="operation" value="-">-</button>
+            <button class="number" value="1">1</button>
+            <button class="number" value="2">2</button>
+            <button class="number" value="3">3</button>
+            <button class="operation" value="*">*</button>
+            <button class="number" value="0">0</button>
+            <button class="number" value=".">.</button>
+            <button class="operation" value="/">&divide;</button>
+            <button class="equals" value="=">=</button>
+            <button class="clear" value="C">C</button>
         </div>
     </div>
     <script>
-        const display = document.getElementById('display');
-        const keys = document.querySelectorAll('.key');
-
+        let display = document.getElementById('display');
         let currentInput = '';
-        let previousInput = '';
-        let operator = null;
+        let result = 0;
 
-        keys.forEach((key) => {
-            key.addEventListener('click', () => {
-                const keyValue = key.id;
-                switch (keyValue) {
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7':
-                    case '8':
-                    case '9':
-                    case 'decimal':
-                        currentInput += keyValue;
-                        display.value = currentInput;
-                        break;
-                    case 'add':
-                    case 'subtract':
-                    case 'multiply':
-                    case 'divide':
-                        previousInput = currentInput;
-                        currentInput = '';
-                        operator = keyValue;
-                        break;
-                    case 'equals':
-                        if (operator !== null) {
-                            const result = calculateResult(previousInput, operator, currentInput);
-                            display.value = result;
-                            previousInput = '';
-                            currentInput = result;
-                            operator = null;
-                        }
-                        break;
-                    case 'clear':
-                        currentInput = '';
-                        previousInput = '';
-                        operator = null;
-                        display.value = '0';
-                        break;
-                    default:
-                        console.error(`Unknown key pressed: ${keyValue}`);
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', handleButtonPress);
             });
         });
 
-        function calculateResult(num1, operator, num2) {
-            const n1 = parseFloat(num1);
-            const n2 = parseFloat(num2);
-            switch (operator) {
-                case 'add':
-                    return n1 + n2;
-                case 'subtract':
-                    return n1 - n2;
-                case 'multiply':
-                    return n1 * n2;
-                case 'divide':
-                    if (n2 !== 0) {
-                        return n1 / n2;
-                    } else {
-                        return 'Error';
-                    }
+        function handleButtonPress(event) {
+            const buttonValue = event.target.value;
+            switch (buttonValue) {
+                case '=':
+                    calculateResult();
+                    break;
+                case 'C':
+                    clearInput();
+                    break;
                 default:
-                    console.error(`Unknown operator: ${operator}`);
-                    return 'Error';
+                    currentInput += buttonValue;
+                    display.value = currentInput;
             }
+        }
+
+        function calculateResult() {
+            try {
+                result = eval(currentInput);
+                display.value = result;
+                currentInput = '';
+            } catch (error) {
+                display.value = 'Error';
+                currentInput = '';
+            }
+        }
+
+        function clearInput() {
+            currentInput = '';
+            display.value = '';
+            result = 0;
         }
     </script>
 </body>
